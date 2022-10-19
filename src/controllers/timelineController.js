@@ -1,5 +1,5 @@
-import connection from "../database.js";
 import urlMetadata from "url-metadata";
+import connection from "../database/database.js";
 
 const postLink = async (req, res) => {
   const body = res.locals.body;
