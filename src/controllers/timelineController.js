@@ -1,10 +1,18 @@
 import connection from "../database.js";
 import urlMetadata from "url-metadata";
 
-const postLink = (req, res) => {
-  const a = req.body;
-  console.log(a);
-  return res.send(a);
+const postLink = async (req, res) => {
+  const body = res.locals.body;
+  try {
+    await connection.query(
+      'INSERT INTO posts(url, description, "userId") VALUES ($1,$2,$3)',
+      [body.url, body.description, body.userId]
+    );
+
+    return res.sendStatus(201);
+  } catch (error) {
+    return res.status(500).send(error);
+  }
 };
 
 const getTimeline = async (req, res) => {
