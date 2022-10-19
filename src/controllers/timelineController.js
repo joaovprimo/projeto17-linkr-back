@@ -1,7 +1,11 @@
 import connection from "../database.js";
 import urlMetadata from "url-metadata";
 
-const postPub = async (req, res) => {};
+const postLink = (req, res) => {
+  const a = req.body;
+  console.log(a);
+  return res.send(a);
+};
 
 const getTimeline = async (req, res) => {
   const allPosts = await connection.query("SELECT * FROM posts LIMIT 20;");
@@ -22,4 +26,4 @@ const getTimeline = async (req, res) => {
   return res.send(allPosts.rows);
 };
 
-export { getTimeline, postPub };
+export { getTimeline, postLink };
