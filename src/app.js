@@ -10,6 +10,8 @@ app.use(express.json());
 app.use(cors());
 
 dotenv.config();
+app.use(cors());
+app.use(express.json());
 
 app.use(Routes);
 
