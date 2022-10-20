@@ -30,7 +30,7 @@ const postLink = async (req, res) => {
 
 const getTimeline = async (req, res) => {
   const allPosts = await connection.query(
-    'SELECT posts.*, users.name, users.email FROM posts JOIN users ON posts."userId" = users.id LIMIT 20 ;'
+    'SELECT posts.*, users.username AS name, users.email, users."pictureUrl" AS image FROM posts JOIN users ON posts."userId" = users.id ORDER BY posts.id DESC LIMIT 20 ;'
   );
 
   for (let i = 0; i < allPosts.rows.length; i++) {
