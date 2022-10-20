@@ -12,4 +12,19 @@ async function getUserInfo({ email }) {
         [email])).rows[0];
 }
 
-export { insertSignup, getUserInfo }
+async function insertSession({token,userid}){
+    return connection.query('INSERT INTO sessions ("userId",token) VALUES ($1,$2)',
+                            [userid,token]);
+}
+
+async function invalidateTokenSession({token}){
+    return connection.query('UPDATE sessions SET "isValid" = FALSE WHERE token=$1',
+                            [token])
+}
+
+async function searchSessionForToken({token}){
+    return (await connection.query('SELECT * FROM sessions WHERE token=$1',
+    [token])).rows[0];
+}
+
+export { insertSignup, getUserInfo, insertSession, invalidateTokenSession, searchSessionForToken }

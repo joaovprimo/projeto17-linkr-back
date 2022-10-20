@@ -1,6 +1,6 @@
 import { StatusCodes } from 'http-status-codes';
 import bcrypt from 'bcrypt';
-import { insertSignup, getUserInfo } from '../repositories/userRepository.js';
+import { insertSignup, getUserInfo, insertSession, invalidateTokenSession } from '../repositories/userRepository.js';
 import jwt from "jsonwebtoken";
 
 async function signup(req, res) {
@@ -27,12 +27,14 @@ async function signin(req, res) {
         if (!authentication) {
             return res.status(StatusCodes.UNAUTHORIZED).send('Error: incorret password');
         }
+        const userid = user.id
         const token = jwt.sign(
-            { id: user.id },
+            { id: userid },
             process.env.TOKEN_SECRET,
             {
                 expiresIn: "10d",
             })
+        await insertSession({ token, userid })
         return res.status(StatusCodes.OK).send({ token: token })
     } catch (error) {
         console.log(error.message);
@@ -40,4 +42,11 @@ async function signin(req, res) {
     }
 }
 
-export { signup, signin }
+async function logout(req, res) {
+    const { authorization } = req.headers;
+    const token = authorization?.replace("Bearer ", "");
+    await invalidateTokenSession({token});
+    return res.sendStatus(StatusCodes.OK);
+}
+
+export { signup, signin, logout }

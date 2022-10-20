@@ -9,7 +9,7 @@ const newUserSchema = joi.object({
 })
 
 const newLoginSchema = joi.object({
-  username: joi.string().required(),
+  email: joi.string().email().required(),
   password: joi.string().required()
 })
 
