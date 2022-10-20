@@ -1,8 +1,8 @@
 import express from "express";
 import userRoute from "./usersRoute.js";
-import postRoute from "./postRoute.js";
+import timelineRoute from "./timelineRoute.js";
 
 const Routes = express.Router();
 Routes.use(userRoute);
-Routes.use(postRoute);
+Routes.use(timelineRoute);
 export default Routes;

@@ -28,7 +28,9 @@
     "http-status-codes": "^2.2.0",
     "joi": "^17.6.3",
     "jsonwebtoken": "^8.5.1",
+    "node-sass": "^7.0.3",
     "pg": "^8.8.0",
+    "url-metadata": "^2.5.0",
     "uuidv4": "^6.2.13"
   },
   "devDependencies": {
