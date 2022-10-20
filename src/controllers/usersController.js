@@ -2,7 +2,7 @@ import { StatusCodes } from "http-status-codes";
 import bcrypt from "bcrypt";
 import {
   insertSignup,
-  getUserInfo,
+  getUserInfoByEmail,
   insertSession,
   invalidateTokenSession,
 } from "../repositories/userRepository.js";
@@ -21,38 +21,37 @@ async function signup(req, res) {
 }
 
 async function signin(req, res) {
-  const { email, password } = req.body;
-  let authentication = false;
-  try {
-    const user = await getUserInfo({ email });
-    if (!user) {
-      return res
-        .status(StatusCodes.UNAUTHORIZED)
-        .send("Error: email not registred");
+    const { email, password } = req.body;
+    let authentication = false;
+    try {
+        const user = await getUserInfoByEmail({ email });
+        if (!user) {
+            return res.status(StatusCodes.UNAUTHORIZED).send('Error: email not registred');
+        }
+        authentication = bcrypt.compareSync(password, user.password);
+        if (!authentication) {
+            return res.status(StatusCodes.UNAUTHORIZED).send('Error: incorret password');
+        }
+        const userid = user.id
+        const token = jwt.sign(
+            { id: userid },
+            process.env.TOKEN_SECRET,
+            {
+                expiresIn: "10d",
+            })
+        await insertSession({ token, userid })
+        return res.status(StatusCodes.OK).send({ token: token, userid })
+    } catch (error) {
+        console.log(error.message);
+        return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
     }
-    authentication = bcrypt.compareSync(password, user.password);
-    if (!authentication) {
-      return res
-        .status(StatusCodes.UNAUTHORIZED)
-        .send("Error: incorret password");
-    }
-    const userid = user.id;
-    const token = jwt.sign({ id: userid }, process.env.TOKEN_SECRET, {
-      expiresIn: "10d",
-    });
-    await insertSession({ token, userid });
-    return res.status(StatusCodes.OK).send({ token: token });
-  } catch (error) {
-    console.log(error.message);
-    return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
-  }
 }
 
 async function logout(req, res) {
-  const { authorization } = req.headers;
-  const token = authorization?.replace("Bearer ", "");
-  await invalidateTokenSession({ token });
-  return res.sendStatus(StatusCodes.OK);
+    const { authorization } = req.headers;
+    const token = authorization?.replace("Bearer ", "");
+    await invalidateTokenSession({ token });
+    return res.sendStatus(StatusCodes.OK);
 }
 
 export { signup, signin, logout };
