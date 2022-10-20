@@ -29,7 +29,9 @@ const postLink = async (req, res) => {
 };
 
 const getTimeline = async (req, res) => {
-  const allPosts = await connection.query("SELECT * FROM posts LIMIT 20;");
+  const allPosts = await connection.query(
+    'SELECT posts.*, users.name, users.email FROM posts JOIN users ON posts."userId" = users.id LIMIT 20 ;'
+  );
 
   for (let i = 0; i < allPosts.rows.length; i++) {
     const urlInfo = await connection.query(
