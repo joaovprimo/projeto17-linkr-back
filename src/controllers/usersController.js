@@ -1,6 +1,6 @@
 import { StatusCodes } from 'http-status-codes';
 import bcrypt from 'bcrypt';
-import { insertSignup, getUserInfo, insertSession, invalidateTokenSession } from '../repositories/userRepository.js';
+import { insertSignup, getUserInfoByEmail, insertSession, invalidateTokenSession } from '../repositories/userRepository.js';
 import jwt from "jsonwebtoken";
 
 async function signup(req, res) {
@@ -19,7 +19,7 @@ async function signin(req, res) {
     const { email, password } = req.body;
     let authentication = false;
     try {
-        const user = await getUserInfo({ email });
+        const user = await getUserInfoByEmail({ email });
         if (!user) {
             return res.status(StatusCodes.UNAUTHORIZED).send('Error: email not registred');
         }
@@ -35,7 +35,7 @@ async function signin(req, res) {
                 expiresIn: "10d",
             })
         await insertSession({ token, userid })
-        return res.status(StatusCodes.OK).send({ token: token })
+        return res.status(StatusCodes.OK).send({ token: token, userid })
     } catch (error) {
         console.log(error.message);
         return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
@@ -45,7 +45,7 @@ async function signin(req, res) {
 async function logout(req, res) {
     const { authorization } = req.headers;
     const token = authorization?.replace("Bearer ", "");
-    await invalidateTokenSession({token});
+    await invalidateTokenSession({ token });
     return res.sendStatus(StatusCodes.OK);
 }
 

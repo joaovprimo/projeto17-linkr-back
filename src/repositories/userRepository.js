@@ -7,7 +7,7 @@ async function insertSignup({ email, username, password, pictureUrl }) {
     );
 }
 
-async function getUserInfo({ email }) {
+async function getUserInfoByEmail({ email }) {
     return (await connection.query('SELECT * FROM users WHERE email=$1;',
         [email])).rows[0];
 }
@@ -27,4 +27,4 @@ async function searchSessionForToken({token}){
     [token])).rows[0];
 }
 
-export { insertSignup, getUserInfo, insertSession, invalidateTokenSession, searchSessionForToken }
+export { insertSignup, getUserInfoByEmail, insertSession, invalidateTokenSession, searchSessionForToken }
