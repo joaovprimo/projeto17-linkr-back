@@ -1,17 +1,17 @@
-import joi from 'joi';
-import { stripHtml } from 'string-strip-html';
+import joi from "joi";
+import { stripHtml } from "string-strip-html";
 
 const newUserSchema = joi.object({
   username: joi.string().min(6).max(20).required(),
   email: joi.string().email().required(),
   password: joi.string().min(5).max(12).required(),
-  pictureUrl: joi.string().pattern(new RegExp('^https:\/\/')).required()
-})
+  pictureUrl: joi.string().pattern(new RegExp("^https://")).required(),
+});
 
 const newLoginSchema = joi.object({
   email: joi.string().email().required(),
-  password: joi.string().required()
-})
+  password: joi.string().required(),
+});
 
 function signupValidations(req, res, next) {
   try {
@@ -23,4 +23,4 @@ function signupValidations(req, res, next) {
   next();
 }
 
-export {signupValidations,newUserSchema, newLoginSchema};
+export { signupValidations, newUserSchema, newLoginSchema };
