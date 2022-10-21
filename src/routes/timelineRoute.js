@@ -7,4 +7,5 @@ const timelineRoute = express.Router();
 timelineRoute.get("/posts", getTimeline);
 timelineRoute.post("/posts", beforePostMiddleware, postLink);
 
+
 export default timelineRoute;
