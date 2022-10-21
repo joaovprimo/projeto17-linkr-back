@@ -27,4 +27,9 @@ async function searchSessionForToken({token}){
     [token])).rows[0];
 }
 
-export { insertSignup, getUserInfoByEmail, insertSession, invalidateTokenSession, searchSessionForToken }
+async function getUserInfoById(id){
+    return (await connection.query('SELECT * FROM users WHERE id=$1',
+    [id])).rows[0];
+}
+
+export { insertSignup, getUserInfoByEmail, insertSession, invalidateTokenSession, searchSessionForToken, getUserInfoById }
