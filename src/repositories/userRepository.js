@@ -28,7 +28,7 @@ async function searchSessionForToken({token}){
 }
 
 async function getUserInfoById(id){
-    return (await connection.query('SELECT * FROM users WHERE id=$1',
+    return (await connection.query('SELECT id,username,email,"pictureUrl" FROM users WHERE id=$1',
     [id])).rows[0];
 }
 
