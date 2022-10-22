@@ -1,11 +1,13 @@
 import express from "express";
 
 import { validateToken } from "../middlewares/validateToken.js"
-import {likesPost, getLikes} from "../controllers/likesController.js";
+import {likesPost, getLikes, getUser} from "../controllers/likesController.js";
 
 const likesRoute = express.Router();
 
 likesRoute.get(`/posts/likes/:id`, getLikes)
-likesRoute.post(`/posts/likes/:id`, validateToken ,likesPost)
+likesRoute.post(`/posts/likes/:id/:idusr`,likesPost)
+likesRoute.get(`/user/:id`, getUser)
+
 
 export default likesRoute;
