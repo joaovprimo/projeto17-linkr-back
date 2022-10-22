@@ -9,4 +9,5 @@ timelineRoute.use(validateToken);
 timelineRoute.get("/posts", getTimeline);
 timelineRoute.post("/posts", beforePostMiddleware, postLink);
 
+
 export default timelineRoute;
