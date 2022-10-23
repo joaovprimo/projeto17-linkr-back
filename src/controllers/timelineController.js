@@ -15,7 +15,8 @@ const postLink = async (req, res) => {
     const { rows: postId } = await trendRepository.getLastPost();
     const splitter = body.description.split("#");
     for (let i = 1; i <= splitter.length - 1; i++) {
-      const trend = splitter[splitter.length - i];
+      let trend = splitter[splitter.length - i];
+      trend = trend.replace(/\s/g, "");
       const pId = postId[0].id;
       const { rows: check } = await trendRepository.getTrendbyName(trend);
       if (check.length === 0) {
