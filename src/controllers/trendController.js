@@ -25,3 +25,12 @@ export async function getPostHashtags(req, res) {
     return res.sendStatus(500);
   }
 }
+
+export async function getTrendRanking(req, res) {
+  try {
+    const { rows: ranking } = await trendRepository.getTrendByRanking();
+    return res.send(ranking);
+  } catch {
+    return res.sendStatus(500);
+  }
+}

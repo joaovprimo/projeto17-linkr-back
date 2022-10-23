@@ -46,3 +46,9 @@ export async function getUrlInfo(url) {
     [url]
   );
 }
+
+export async function getTrendByRanking() {
+  return connection.query(
+    `SELECT * FROM trends ORDER BY visitcount DESC LIMIT 10`
+  );
+}
