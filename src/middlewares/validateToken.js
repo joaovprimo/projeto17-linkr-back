@@ -12,6 +12,7 @@ export async function validateToken(req, res, next) {
   if (!authorization) {
     return res.status(StatusCodes.UNAUTHORIZED).send("Error: empty token");
   }
+  console.log(authorization)
   try {
     const session = await searchSessionForToken({ token });
     if (!session) {
