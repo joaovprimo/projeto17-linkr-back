@@ -3,7 +3,7 @@ import connection from "../database/database.js";
 export async function likesPost (req, res){
     const {idusr} = req.params;
     const {id} = req.params;
-
+    const user = res.locals.user;
 
     try{
         const likeUser = await connection.query(`
@@ -44,7 +44,6 @@ export async function likesPost (req, res){
 export async function getLikes (req, res){
     const {id} = req.params;
    
-console.log(id)
     try{
         const likes = await connection.query(`
         SELECT users.username FROM likes JOIN users ON likes."userId"=users.id WHERE likes."postId" = $1
@@ -62,7 +61,7 @@ console.log(id)
 
 export async function  getUser( req, res){
     const {id} = req.params;
-    console.log(user)
+  
     try{
         const userFind = await connection.query(`
         SELECT * FROM users WHERE id =$1;

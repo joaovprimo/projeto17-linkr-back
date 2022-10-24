@@ -4,7 +4,6 @@ export async function deletePost (req, res){
     const user = res.locals.user;
     const {id} = req.params;
     
-    console.log(user.id);
     try{
         const checkPost = await connection.query(`
         SELECT * FROM posts WHERE id = $1;
