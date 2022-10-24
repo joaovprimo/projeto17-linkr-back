@@ -4,7 +4,6 @@ export async function editPost (req, res){
     const user = res.locals.user;
     const {id} = req.params;
     const {description} = req.body;
-    console.log(description)
     try{
         const post= await connection.query(`
         SELECT * FROM posts WHERE id = $1;
