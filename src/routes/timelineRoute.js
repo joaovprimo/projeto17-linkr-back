@@ -5,7 +5,7 @@ import { validateToken } from "../middlewares/validateToken.js";
 
 const timelineRoute = express.Router();
 
-timelineRoute.use(validateToken);
+
 timelineRoute.get("/posts", getTimeline);
 timelineRoute.post("/posts", beforePostMiddleware, postLink);
 
