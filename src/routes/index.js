@@ -5,11 +5,13 @@ import { searchRoute } from "./searchRouter.js";
 import deleteRoute from "./deleteRouter.js";
 import likesRoute from "./likesRoute.js";
 import editRoute from "./editRouter.js";
+import trendRouter from "./trendRouter.js";
 
 const Routes = express.Router();
 Routes.use(userRoute);
 Routes.use(timelineRoute);
 Routes.use(searchRoute);
+Routes.use(trendRouter);
 
 Routes.use(deleteRoute);
 Routes.use(likesRoute);
