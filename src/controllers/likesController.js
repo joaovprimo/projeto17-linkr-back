@@ -3,7 +3,6 @@ import connection from "../database/database.js";
 export async function likesPost (req, res){
     const {idusr} = req.params;
     const {id} = req.params;
-    const user = res.locals.user;
 
     try{
         const likeUser = await connection.query(`
