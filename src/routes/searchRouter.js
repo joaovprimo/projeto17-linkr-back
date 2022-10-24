@@ -1,8 +1,11 @@
 import express from "express";
-import { searchUser } from "../controllers/searchController.js";
+import { getNameById, searchUser, searchUserId } from "../controllers/searchController.js";
 
 const searchRoute = express.Router();
 
 searchRoute.get("/search", searchUser);
+searchRoute.get("/search/:id", searchUserId);
+searchRoute.get("/name/:id", getNameById);
+
 
 export {searchRoute};
