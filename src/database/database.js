@@ -11,11 +11,4 @@ const connection = new Pool({
     },
 });
 
-/*const connection = new Pool({
-    host: '127.0.0.1',
-    port: '5432',
-    user: 'postgres',
-    password: '1234',
-    database: 'linkr'
-});*/
 export default connection;

@@ -1,5 +1,4 @@
 import express from "express";
-
 import {likesPost, getLikes, getUser} from "../controllers/likesController.js";
 import { validateToken } from "../middlewares/validateToken.js";
 
