@@ -4,12 +4,12 @@ export async function editPost (req, res){
     const user = res.locals.user;
     const {id} = req.params;
     const {description} = req.body;
+    console.log(description)
     try{
         const post= await connection.query(`
         SELECT * FROM posts WHERE id = $1;
         `, [id]);
         const postUser = post.rows[0];
-        console.log(postUser)
         if(user.id !== postUser.userId){
             return res.status(401).send("Action not allowed, the user does not match with the post's owner");
         }
@@ -19,7 +19,7 @@ export async function editPost (req, res){
         const postEdited = await connection.query(`
         SELECT * FROM posts WHERE id = $1;
         `, [id]);
-        return res.status(200).send(postEdited.rows[0])
+        return res.status(200).send(postEdited.rows[0].description)
 
     }catch(err){
         return res.status(500).send(err.message);

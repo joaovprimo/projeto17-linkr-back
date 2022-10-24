@@ -1,6 +1,5 @@
 import express from "express";
 
-import { validateToken } from "../middlewares/validateToken.js"
 import {likesPost, getLikes, getUser} from "../controllers/likesController.js";
 
 const likesRoute = express.Router();
