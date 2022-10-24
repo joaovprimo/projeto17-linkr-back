@@ -1,5 +1,6 @@
 import urlMetadata from "url-metadata";
 import connection from "../database/database.js";
+import * as trendRepository from "../repositories/trendsRepository.js";
 
 const postLink = async (req, res) => {
   const body = res.locals.body;
@@ -11,13 +12,28 @@ const postLink = async (req, res) => {
     const { canonical, image, title, description } = await urlMetadata(
       body.url
     );
+    const { rows: postId } = await trendRepository.getLastPost();
+    const splitter = body.description.split("#");
+    for (let i = 1; i <= splitter.length - 1; i++) {
+      let trend = splitter[splitter.length - i];
+      trend = trend.replace(/\s/g, "");
+      const pId = postId[0].id;
+      const { rows: check } = await trendRepository.getTrendbyName(trend);
+      if (check.length === 0) {
+        await trendRepository.insertNewTrend(trend);
+      } else {
+        await trendRepository.updateTrend(check[0].id);
+      }
+      const { rows: trendId } = await trendRepository.getTrendbyName(trend);
+      await trendRepository.insertPostTrends(pId, trendId[0].id);
+    }
     await connection.query(
       'INSERT INTO "urlInfo" (url, canonical, image, title, description) VALUES ($1,$2,$3,$4,$5)',
       [body.url, canonical, image, title, description]
     );
-
     return res.sendStatus(201);
   } catch (error) {
+    console.log(error);
     switch (error.code) {
       case "23505":
         return res.sendStatus(201);

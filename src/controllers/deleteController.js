@@ -21,11 +21,11 @@ export async function deletePost (req, res){
             return res.status(401).send("Action not allowed, the user does not match with the post's owner");
         }
         
-        /*await connection.query(`
-        DELETE * FROM likes WHERE "postId" = $1;
-        `, [id]);
         await connection.query(`
-        DELETE * FROM postsTrends WHERE "postId" = $1;
+        DELETE FROM likes WHERE "postId" = $1;
+        `, [id]);
+        /*await connection.query(`
+        DELETE FROM postsTrends WHERE "postId" = $1;
         `, [id]);*/
         await connection.query(`
         DELETE FROM posts WHERE id = $1;
