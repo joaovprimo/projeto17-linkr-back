@@ -1,12 +1,31 @@
 import connection from "../database/database.js";
+import { searchUsersRepository } from "../repositories/searchRepository.js";
 
+let lim=""
 const searchUser= async (req,res)=>{
+    lim=`LIMIT 5`;
     const {search} = req.query;
     if(!search){
         return res.sendStatus(404);
     };
     try{
-        const response = (await connection.query(`SELECT * FROM users WHERE username ILIKE $1 LIMIT 5`,[`%${search}%`])).rows;
+        // const response = (await connection.query(`SELECT * FROM users WHERE username ILIKE $1 ${lim}`,[`%${search}%`])).rows;
+        const response =  await searchUsersRepository(lim,search);
+        return res.send(response);
+    }catch(err){
+        return res.status(500).send(err.message);
+    };
+};
+
+const searchAllUsers = async (req,res)=>{
+    lim="";
+    const {search} = req.query;
+    if(!search){
+        return res.sendStatus(404);
+    };
+    try{
+        // const response = (await connection.query(`SELECT * FROM users WHERE username ILIKE $1 ${lim}`,[`%${search}%`])).rows;
+        const response =  await searchUsersRepository(lim,search);
         return res.send(response);
     }catch(err){
         return res.status(500).send(err.message);
@@ -57,4 +76,4 @@ const getNameById=async(req,res)=>{
 };
 
 
-export {searchUser,searchUserId,getNameById}
+export {searchUser,searchUserId,getNameById,searchAllUsers}
