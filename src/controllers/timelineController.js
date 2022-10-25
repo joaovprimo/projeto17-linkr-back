@@ -6,8 +6,8 @@ const postLink = async (req, res) => {
   const body = res.locals.body;
   try {
     await connection.query(
-      'INSERT INTO posts(url, description, "userId") VALUES ($1,$2,$3)',
-      [body.url, body.description, body.userId]
+      'INSERT INTO posts(url, description, "userId", "reposterId") VALUES ($1,$2,$3,$4)',
+      [body.url, body.description, body.userId, body.reposterId]
     );
     const { canonical, image, title, description } = await urlMetadata(
       body.url
