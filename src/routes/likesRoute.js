@@ -4,8 +4,8 @@ import { validateToken } from "../middlewares/validateToken.js";
 
 const likesRoute = express.Router();
 
-likesRoute.get(`/posts/likes/:id`, validateToken,getLikes)
-likesRoute.post(`/posts/likes/:id/:idusr`,validateToken,likesPost)
+likesRoute.get(`/posts/likes/:id`,getLikes)
+likesRoute.post(`/posts/likes/:id/:idusr`,likesPost)
 likesRoute.get(`/user/:id`, getUser)
 
 
