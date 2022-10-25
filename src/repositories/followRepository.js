@@ -18,4 +18,10 @@ async function createFollowerById(id,userId){
     return;
 }
 
-export {getFollowedById, deleteFollowerById, createFollowerById}
+async function getUserFollows(userId){
+        const follows = (await connection.query(
+            'SELECT * FROM followers WHERE "followerId"=$1',[userId])).rows;
+        return follows;
+}
+
+export {getFollowedById, deleteFollowerById, createFollowerById, getUserFollows}

@@ -1,4 +1,5 @@
 import { StatusCodes } from "http-status-codes";
+import connection from "../database/database.js";
 import { 
     createFollowerById, deleteFollowerById, getFollowedById 
 } from "../repositories/followRepository.js";

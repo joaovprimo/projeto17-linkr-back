@@ -33,6 +33,7 @@ export async function deletePost (req, res){
         return res.status(204).send("Deleted");
 
     }catch(err){
+        console.log(err.message)
         return res.status(500).send(err.message)
     }
 }
