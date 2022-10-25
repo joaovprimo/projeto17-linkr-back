@@ -1,6 +1,8 @@
 import urlMetadata from "url-metadata";
 import connection from "../database/database.js";
+import { getUserFollows } from "../repositories/followRepository.js";
 import * as trendRepository from "../repositories/trendsRepository.js";
+import { StatusCodes } from "http-status-codes";
 
 const postLink = async (req, res) => {
   const body = res.locals.body;
@@ -45,19 +47,36 @@ const postLink = async (req, res) => {
 };
 
 const getTimeline = async (req, res) => {
-  const allPosts = await connection.query(
-    'SELECT posts.*, users.username AS name, users.email, users."pictureUrl" AS image FROM posts JOIN users ON posts."userId" = users.id ORDER BY posts.id DESC LIMIT 20 ;'
-  );
-
-  for (let i = 0; i < allPosts.rows.length; i++) {
-    const urlInfo = await connection.query(
-      'SELECT canonical,image,title,description FROM "urlInfo" WHERE url = $1',
-      [allPosts.rows[i].url]
-    );
-    allPosts.rows[i].urlInfo = urlInfo.rows[0];
+  const {id} = res.locals.user;
+  try {
+    const follows = await getUserFollows(id);
+    if(follows.length===0){
+      return res.status(StatusCodes.OK).send('no follows');
+    }
+    const allPosts = await connection.query(
+      `SELECT posts.*, users.username AS name, users.email, users."pictureUrl" AS image
+      FROM posts 
+      JOIN followers ON posts."userId" = followers."followedId"
+      JOIN users ON posts."userId" = users.id
+      WHERE followers."followerId"=$1
+      ORDER BY posts.id DESC 
+      LIMIT 20;`
+    ,[id]);
+    for (let i = 0; i < allPosts.rows.length; i++) {
+      const urlInfo = await connection.query(
+        'SELECT canonical,image,title,description FROM "urlInfo" WHERE url = $1',
+        [allPosts.rows[i].url]
+      );
+      allPosts.rows[i].urlInfo = urlInfo.rows[0];
+    }
+    if(allPosts.rows.length===0){
+      return res.status(StatusCodes.OK).send('no posts');
+    }
+    return res.status(StatusCodes.OK).send(allPosts.rows);
+  } catch (error) {
+    return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
   }
 
-  return res.send(allPosts.rows);
 };
 
 export { getTimeline, postLink };
