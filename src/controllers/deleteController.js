@@ -1,14 +1,13 @@
 import connection from "../database/database.js";
+import { getPostById } from "../repositories/editRepository.js";
+import {deleteLikesPost, deletePost} from "../repositories/deleteRepository.js";
 
-export async function deletePost (req, res){
+export async function deletePostFunction (req, res){
     const user = res.locals.user;
     const {id} = req.params;
     
-    console.log(user.id);
     try{
-        const checkPost = await connection.query(`
-        SELECT * FROM posts WHERE id = $1;
-        `,[id]);
+        const checkPost = await getPostById(id);
        
 
         if(checkPost.rowCount === 0){
@@ -21,19 +20,16 @@ export async function deletePost (req, res){
             return res.status(401).send("Action not allowed, the user does not match with the post's owner");
         }
         
-        await connection.query(`
-        DELETE FROM likes WHERE "postId" = $1;
-        `, [id]);
+        const dltlikesPost = await deleteLikesPost(id);
         /*await connection.query(`
         DELETE FROM postsTrends WHERE "postId" = $1;
         `, [id]);*/
-        await connection.query(`
-        DELETE FROM posts WHERE id = $1;
-        `, [id]);
+        const dltPost = await deletePost(id);
 
         return res.status(204).send("Deleted");
 
     }catch(err){
+        console.log(err.message)
         return res.status(500).send(err.message)
     }
 }
