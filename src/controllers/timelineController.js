@@ -3,7 +3,7 @@ import connection from "../database/database.js";
 import { getUserFollows } from "../repositories/followRepository.js";
 import * as trendRepository from "../repositories/trendsRepository.js";
 import { StatusCodes } from "http-status-codes";
-import { fetchOriginalPost, insertRepost } from "../repositories/repostRepository.js";
+import { fetchOriginalPost, getRepostsCountById, insertRepost } from "../repositories/repostRepository.js";
 
 const postLink = async (req, res) => {
   const body = res.locals.body;
@@ -83,10 +83,10 @@ const getTimeline = async (req, res) => {
 const getRepostsById = async (req,res) => {
 const {id} = req.params;
 
-const reposts = await connection.query('SELECT COUNT(*) as "repostsNumber", posts."originPostId" AS "originPost" FROM posts WHERE posts."originPostId" = $1 GROUP BY "originPostId";',[id])
-if(reposts.rows.length === 0) return res.status(404).send({message:"Não existem reposts", res: 0})
+const reposts = await getRepostsCountById(id);
+if(!reposts) return res.status(404).send({message:"Não existem reposts", res: 0})
 
-return res.send(reposts.rows[0])
+return res.send(reposts)
 
 }
 

@@ -1,6 +1,6 @@
 import { likeUser, postLike, likesPost, deleteLike, getLike, userFind } from "../repositories/likesRepository.js";
 
-export async function likesPost (req, res){
+export async function likesPostFunction (req, res){
     const {idusr} = req.params;
     const {id} = req.params;
 
