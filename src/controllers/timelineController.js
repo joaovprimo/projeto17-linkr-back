@@ -3,6 +3,7 @@ import connection from "../database/database.js";
 import { getUserFollows } from "../repositories/followRepository.js";
 import * as trendRepository from "../repositories/trendsRepository.js";
 import { StatusCodes } from "http-status-codes";
+import { fetchOriginalPost } from "../repositories/repostRepository.js";
 
 const postLink = async (req, res) => {
   const body = res.locals.body;
@@ -79,4 +80,35 @@ const getTimeline = async (req, res) => {
 
 };
 
-export { getTimeline, postLink };
+const getRepostsById = async (req,res) => {
+const {id} = req.params;
+
+const reposts = await connection.query('SELECT COUNT(*) as "repostsNumber", posts."originPostId" AS "originPost" FROM posts WHERE posts."originPostId" = $1 GROUP BY "originPostId";',[id])
+if(reposts.rows.length === 0) return res.status(404).send({message:"Não existem reposts", res: 0})
+
+return res.send(reposts.rows[0])
+
+}
+
+const postRepost = async (req,res) => {
+  const {idPost, reposterId} = req.body;
+
+  try{
+    const originalPost = await fetchOriginalPost(idPost);
+    if(!originalPost) return res.status(StatusCodes.BAD_REQUEST).send("Post original inexistente")
+    if(originalPost.originPostId) {
+      originalPost.originId = originalPost.originPostId;
+    }
+    delete originalPost.originPostId;
+
+    originalPost.reposterId = reposterId;
+    await connection.query('INSERT INTO posts (url, "userId",description, "reposterId","originPostId") VALUES ($1,$2,$3,$4,$5)',[originalPost.url,originalPost.userId,originalPost.description,originalPost.reposterId,originalPost.originId]);
+  
+    return res.sendStatus(StatusCodes.OK)
+  }catch(error){
+    return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+  }
+
+}
+
+export { getTimeline, postLink, getRepostsById,postRepost };

@@ -2,9 +2,9 @@ import isValidUrl from "../regex/isValidUrl.js";
 import postSchema from "../schemas/postSchema.js";
 
 const beforePostMiddleware = async (req, res, next) => {
-  const { url, description, userId, reposterId } = req.body;
+  const { url, description, userId } = req.body;
 
-  const { error, value } = postSchema.validate({ url, description, userId, reposterId });
+  const { error, value } = postSchema.validate({ url, description, userId });
   if (error)
     return res.status(500).send(error.details.map((value) => value.message));
 
