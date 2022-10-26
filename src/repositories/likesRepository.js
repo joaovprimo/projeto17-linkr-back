@@ -14,7 +14,7 @@ async function postLike (id, idusr){
     return liking;
 }
 
-async function likesPost (id){
+async function liksPost (id){
    const like = await connection.query(`
     SELECT users.username FROM likes JOIN users ON likes."userId"=users.id WHERE likes."postId" = $1
 `, [id]);
@@ -42,4 +42,4 @@ const usr = await connection.query(`
 return usr;
 }
 
-export {likeUser, postLike, likesPost, deleteLike, getLike, userFind}
+export {likeUser, postLike, liksPost, deleteLike, getLike, userFind}
