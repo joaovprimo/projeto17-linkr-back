@@ -1,6 +1,5 @@
-import connection from "../database/database.js";
 import { getPostById } from "../repositories/editRepository.js";
-import {deleteLikesPost, deletePost} from "../repositories/deleteRepository.js";
+import {deleteLikesPost, deletPost} from "../repositories/deleteRepository.js";
 
 export async function deletePostFunction (req, res){
     const user = res.locals.user;
@@ -24,7 +23,7 @@ export async function deletePostFunction (req, res){
         /*await connection.query(`
         DELETE FROM postsTrends WHERE "postId" = $1;
         `, [id]);*/
-        const dltPost = await deletePost(id);
+        const dltPost = await deletPost(id);
 
         return res.status(204).send("Deleted");
 
