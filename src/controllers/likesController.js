@@ -1,4 +1,4 @@
-import { likeUser, postLike, likesPost, deleteLike, getLike, userFind } from "../repositories/likesRepository.js";
+import { likeUser, postLike, liksPost, deleteLike, getLike, userFind } from "../repositories/likesRepository.js";
 
 export async function likesPost (req, res){
     const {idusr} = req.params;
@@ -9,7 +9,7 @@ export async function likesPost (req, res){
 
         if(likeUsr.rowCount === 0){
             const like =  await postLike(id, idusr);
-            const likesPosted = await likesPost(id);
+            const likesPosted = await liksPost(id);
 
             return res.status(200).send({
                 likesarray:likesPosted.rows,
@@ -18,7 +18,7 @@ export async function likesPost (req, res){
         }else{
             const deteLike =  await deleteLike(id, idusr);
 
-            const likesPosted = await likesPost(id);
+            const likesPosted = await liksPost(id);
         return res.send({
             likesarray:likesPosted.rows,
             likeslength:likesPosted.rowCount});
@@ -49,12 +49,12 @@ export async function  getUser( req, res){
     const {id} = req.params;
   
     try{
-        const userFind = await userFind(id)
+        const usrFind = await userFind(id)
 
-        if(userFind.rowCount===0){
+        if(usrFind.rowCount===0){
             return res.sendStatus(404);
         }
-        return res.status(200).send(userFind.rows[0]);
+        return res.status(200).send(usrFind.rows[0]);
     }catch(err){
         return res.status(500).send(err.message);
     }
