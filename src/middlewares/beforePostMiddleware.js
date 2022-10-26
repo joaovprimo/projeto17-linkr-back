@@ -13,7 +13,7 @@ const beforePostMiddleware = async (req, res, next) => {
       .status(422)
       .send("Certifique-se de que o campo enviado é uma URL válida");
 
-  res.locals.body = { url, description, userId, reposterId };
+  res.locals.body = { url, description, userId };
   next();
 };
 
