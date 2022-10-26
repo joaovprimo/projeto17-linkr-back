@@ -2,7 +2,7 @@ import connection from "../database/database.js";
 import { getPostById } from "../repositories/editRepository.js";
 import {deleteLikesPost, deletePost} from "../repositories/deleteRepository.js";
 
-export async function deletePost (req, res){
+export async function deletePostFunction (req, res){
     const user = res.locals.user;
     const {id} = req.params;
     
