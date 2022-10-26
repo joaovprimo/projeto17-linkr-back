@@ -3,7 +3,7 @@ import connection from "../database/database.js";
 import { getUserFollows } from "../repositories/followRepository.js";
 import * as trendRepository from "../repositories/trendsRepository.js";
 import { StatusCodes } from "http-status-codes";
-import { fetchOriginalPost } from "../repositories/repostRepository.js";
+import { fetchOriginalPost, insertRepost } from "../repositories/repostRepository.js";
 
 const postLink = async (req, res) => {
   const body = res.locals.body;
@@ -102,8 +102,7 @@ const postRepost = async (req,res) => {
     delete originalPost.originPostId;
 
     originalPost.reposterId = reposterId;
-    await connection.query('INSERT INTO posts (url, "userId",description, "reposterId","originPostId") VALUES ($1,$2,$3,$4,$5)',[originalPost.url,originalPost.userId,originalPost.description,originalPost.reposterId,originalPost.originId]);
-  
+    insertRepost(originalPost);
     return res.sendStatus(StatusCodes.OK)
   }catch(error){
     return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
