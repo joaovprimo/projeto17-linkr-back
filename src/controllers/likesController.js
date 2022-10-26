@@ -1,38 +1,27 @@
-import connection from "../database/database.js";
+import { likeUser, postLike, likesPost, deleteLike, getLike, userFind } from "../repositories/likesRepository.js";
 
 export async function likesPost (req, res){
     const {idusr} = req.params;
     const {id} = req.params;
 
     try{
-        const likeUser = await connection.query(`
-        SELECT * FROM likes WHERE "postId" = $1 AND "userId"=$2; 
-        `, [id, idusr]);
-        console.log(likeUser.rows)
+        const likeUsr = await likeUser(id, idusr);
 
-        if(likeUser.rowCount === 0){
-            const postLike =  await connection.query(`
-            INSERT INTO likes ("postId","userId") VALUES ($1,$2);
-            `,[id, idusr]);
-            const likesPost = await connection.query(`
-            SELECT users.username FROM likes JOIN users ON likes."userId"=users.id WHERE likes."postId" = $1
-        `, [id]);
+        if(likeUsr.rowCount === 0){
+            const like =  await postLike(id, idusr);
+            const likesPosted = await likesPost(id);
 
             return res.status(200).send({
-                likesarray:likesPost.rows,
-                likeslength:likesPost.rowCount
+                likesarray:likesPosted.rows,
+                likeslength:likesPosted.rowCount
             });
         }else{
-            const deteLike =  await connection.query(`
-            DELETE FROM likes WHERE "postId" = $1 AND "userId"=$2;
-            `,[id, idusr]);
+            const deteLike =  await deleteLike(id, idusr);
 
-            const likesPost = await connection.query(`
-            SELECT users.username FROM likes JOIN users ON likes."userId"=users.id WHERE likes."postId" = $1
-            `, [id]);
+            const likesPosted = await likesPost(id);
         return res.send({
-            likesarray:likesPost.rows,
-            likeslength:likesPost.rowCount});
+            likesarray:likesPosted.rows,
+            likeslength:likesPosted.rowCount});
         }
       
     }catch(err){
@@ -44,9 +33,7 @@ export async function getLikes (req, res){
     const {id} = req.params;
    
     try{
-        const likes = await connection.query(`
-        SELECT users.username FROM likes JOIN users ON likes."userId"=users.id WHERE likes."postId" = $1
-        `, [id]);
+        const likes = await getLike(id);
         if(likes.rowCount === 0){
             return res.send("0");
         }
@@ -62,9 +49,7 @@ export async function  getUser( req, res){
     const {id} = req.params;
   
     try{
-        const userFind = await connection.query(`
-        SELECT * FROM users WHERE id =$1;
-        `,[id]);
+        const userFind = await userFind(id)
 
         if(userFind.rowCount===0){
             return res.sendStatus(404);
