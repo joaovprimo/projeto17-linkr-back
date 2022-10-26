@@ -7,11 +7,11 @@ async function deleteLikesPost(id){
 return dlt;
 }
 
-async function deletePost(id){
+async function deletPost(id){
     const dlt = await connection.query(`
     DELETE FROM posts WHERE id = $1;
     `, [id]);
     return dlt;
 }
 
-export {deleteLikesPost, deletePost}
+export {deleteLikesPost, deletPost}
