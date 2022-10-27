@@ -8,12 +8,15 @@ import {
     getUserInfoById
 } from "../repositories/userRepository.js";
 import jwt from "jsonwebtoken";
+import { createFollowerById } from "../repositories/followRepository.js";
 
 async function signup(req, res) {
     let { email, password, username, pictureUrl } = req.body;
     password = bcrypt.hashSync(password, 12);
     try {
         await insertSignup({ email, password, username, pictureUrl });
+        const user = await getUserInfoByEmail({ email });
+        await createFollowerById(user.id,user.id);
         return res.sendStatus(StatusCodes.CREATED);
     } catch (error) {
         console.log(error.message);

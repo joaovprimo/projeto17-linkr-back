@@ -50,10 +50,6 @@ const postLink = async (req, res) => {
 const getTimeline = async (req, res) => {
   const {id} = res.locals.user;
   try {
-    const follows = await getUserFollows(id);
-    if(follows.length===0){
-      return res.status(StatusCodes.OK).send('no follows');
-    }
     const allPosts = await connection.query(
       `SELECT posts.*, users.username AS name, users.email, users."pictureUrl" AS image
       FROM posts 
@@ -63,6 +59,7 @@ const getTimeline = async (req, res) => {
       ORDER BY posts.id DESC 
       LIMIT 20;`
     ,[id]);
+
     for (let i = 0; i < allPosts.rows.length; i++) {
       const urlInfo = await connection.query(
         'SELECT canonical,image,title,description FROM "urlInfo" WHERE url = $1',
@@ -70,11 +67,16 @@ const getTimeline = async (req, res) => {
       );
       allPosts.rows[i].urlInfo = urlInfo.rows[0];
     }
+    const follows = await getUserFollows(id);
+    if(follows.length===0 && allPosts.rows.length===0){
+      return res.status(StatusCodes.OK).send('no follows');
+    }
     if(allPosts.rows.length===0){
       return res.status(StatusCodes.OK).send('no posts');
     }
     return res.status(StatusCodes.OK).send(allPosts.rows);
   } catch (error) {
+    console.log(error.message)
     return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
   }
 
