@@ -30,10 +30,13 @@ const postLink = async (req, res) => {
       const { rows: trendId } = await trendRepository.getTrendbyName(trend);
       await trendRepository.insertPostTrends(pId, trendId[0].id);
     }
-    await connection.query(
-      'INSERT INTO "urlInfo" (url, canonical, image, title, description) VALUES ($1,$2,$3,$4,$5)',
-      [body.url, canonical, image, title, description]
-    );
+    const url = await connection.query('SELECT * FROM "urlInfo" WHERE url=$1',[body.url]);
+    if(!url){
+      await connection.query(
+        'INSERT INTO "urlInfo" (url, canonical, image, title, description) VALUES ($1,$2,$3,$4,$5)',
+        [body.url, canonical, image, title, description]
+      );
+    }
     return res.sendStatus(201);
   } catch (error) {
     console.log(error);
