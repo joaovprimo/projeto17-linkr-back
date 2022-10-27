@@ -4,7 +4,7 @@ import { getUserFollows } from "../repositories/followRepository.js";
 import * as trendRepository from "../repositories/trendsRepository.js";
 import { StatusCodes } from "http-status-codes";
 import { fetchOriginalPost, getRepostsCountById, insertRepost } from "../repositories/repostRepository.js";
-import { insertIntoPosts, insertIntoUrlInfo } from "../repositories/timelineRepositoty.js";
+import { getTimelineByConnections, insertIntoPosts, insertIntoUrlInfo, selectUrlByUrl } from "../repositories/timelineRepositoty.js";
 
 const postLink = async (req, res) => {
   const body = res.locals.body;
@@ -29,37 +29,26 @@ const postLink = async (req, res) => {
       await trendRepository.insertPostTrends(pId, trendId[0].id);
     }
     await insertIntoUrlInfo(body,canonical,image,title,description)
-    return res.sendStatus(201);
+    return res.sendStatus(StatusCodes.CREATED);
   } catch (error) {
    
     switch (error.code) {
       case "23505":
-        return res.sendStatus(201);
+        return res.sendStatus(StatusCodes.CREATED);
       case "ENOTFOUND":
-        return res.status(422).send("Link enviado está quebrado");
+        return res.status(StatusCodes.BAD_REQUEST).send("Link enviado está quebrado");
     }
-    return res.status(500).send(error);
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(error);
   }
 };
 
 const getTimeline = async (req, res) => {
   const {id} = res.locals.user;
   try {
-    const allPosts = await connection.query(
-      `SELECT posts.*, users.username AS name, users.email, users."pictureUrl" AS image
-      FROM posts 
-      JOIN followers ON posts."userId" = followers."followedId"
-      JOIN users ON posts."userId" = users.id
-      WHERE followers."followerId"=$1
-      ORDER BY posts.id DESC 
-      LIMIT 20;`
-    ,[id]);
+    const allPosts = await getTimelineByConnections(id);
 
     for (let i = 0; i < allPosts.rows.length; i++) {
-      const urlInfo = await connection.query(
-        'SELECT canonical,image,title,description FROM "urlInfo" WHERE url = $1',
-        [allPosts.rows[i].url]
-      );
+      const urlInfo = await selectUrlByUrl(allPosts.rows[i].url)
       allPosts.rows[i].urlInfo = urlInfo.rows[0];
     }
     const follows = await getUserFollows(id);

@@ -14,4 +14,25 @@ async function insertIntoUrlInfo(body,canonical, image, title, description){
       );
 }
 
-export { insertIntoPosts, insertIntoUrlInfo}
+async function getTimelineByConnections(id){
+    const allPosts = connection.query(
+        `SELECT posts.*, users.username AS name, users.email, users."pictureUrl" AS image
+        FROM posts 
+        JOIN followers ON posts."userId" = followers."followedId"
+        JOIN users ON posts."userId" = users.id
+        WHERE followers."followerId"=$1
+        ORDER BY posts.id DESC 
+        LIMIT 20;`
+      ,[id]);
+      return allPosts;
+}
+
+async function selectUrlByUrl(url){
+    const urlInfo = await connection.query(
+        'SELECT canonical,image,title,description FROM "urlInfo" WHERE url = $1',
+        [url]
+      );
+      return urlInfo
+}
+
+export { insertIntoPosts, insertIntoUrlInfo, getTimelineByConnections, selectUrlByUrl}
