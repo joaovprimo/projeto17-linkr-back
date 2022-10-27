@@ -86,7 +86,7 @@ const getRepostsById = async (req,res) => {
 const {id} = req.params;
 
 const reposts = await getRepostsCountById(id);
-if(!reposts) return res.status(404).send({message:"Não existem reposts", res: 0})
+if(!reposts) return res.send({repostsNumber: 0})
 
 return res.send(reposts)
 
