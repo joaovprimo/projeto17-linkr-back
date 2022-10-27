@@ -4,14 +4,12 @@ import { getUserFollows } from "../repositories/followRepository.js";
 import * as trendRepository from "../repositories/trendsRepository.js";
 import { StatusCodes } from "http-status-codes";
 import { fetchOriginalPost, getRepostsCountById, insertRepost } from "../repositories/repostRepository.js";
+import { insertIntoPosts, insertIntoUrlInfo } from "../repositories/timelineRepositoty.js";
 
 const postLink = async (req, res) => {
   const body = res.locals.body;
   try {
-    await connection.query(
-      'INSERT INTO posts(url, description, "userId", "reposterId") VALUES ($1,$2,$3,$4)',
-      [body.url, body.description, body.userId, body.reposterId]
-    );
+  await insertIntoPosts(body);
     const { canonical, image, title, description } = await urlMetadata(
       body.url
     );
@@ -30,13 +28,10 @@ const postLink = async (req, res) => {
       const { rows: trendId } = await trendRepository.getTrendbyName(trend);
       await trendRepository.insertPostTrends(pId, trendId[0].id);
     }
-    await connection.query(
-      'INSERT INTO "urlInfo" (url, canonical, image, title, description) VALUES ($1,$2,$3,$4,$5)',
-      [body.url, canonical, image, title, description]
-    );
+    await insertIntoUrlInfo(body,canonical,image,title,description)
     return res.sendStatus(201);
   } catch (error) {
-    console.log(error);
+   
     switch (error.code) {
       case "23505":
         return res.sendStatus(201);
