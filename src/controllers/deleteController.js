@@ -1,6 +1,6 @@
 import { getPostById } from "../repositories/editRepository.js";
 import {deleteLikesPost, deleteTrendsByDescription, deletPost, deletPostTrendsByPostId} from "../repositories/deleteRepository.js";
-import { getPostByDescription } from "../repositories/postRepository.js";
+import { getPostByTrend } from "../repositories/postRepository.js";
 
 export async function deletePostFunction (req, res){
     const user = res.locals.user;
@@ -17,10 +17,13 @@ export async function deletePostFunction (req, res){
             return res.status(401).send("Action not allowed, the user does not match with the post's owner");
         }
         await deletPostTrendsByPostId(id);
-        const trends = await getPostByDescription(postDescription);
-        if(trends.rowCount===1){
-            const trend = postDescription.replace('#','');
-            await deleteTrendsByDescription(trend);
+
+        const trendsArray = postDescription.split('#');  
+        for(let i=1;i<=trendsArray.length-1;i++) {
+            const trends = await getPostByTrend('#'+trendsArray[1].trim());
+            if(trends.rowCount===1){
+                const aux= await deleteTrendsByDescription(trendsArray[i].trim());
+            }
         }
         await deleteLikesPost(id);
         await deletPost(id);
