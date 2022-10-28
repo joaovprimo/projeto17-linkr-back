@@ -1,5 +1,4 @@
-import connection from "../database/database.js";
-import { searchUsersRepository } from "../repositories/searchRepository.js";
+import { getNameByIdRepository, searchUserIdPostsRepository, searchUserIdUrlInfoRepository, searchAllUsersRepository, searchUsersFollowedRepository } from "../repositories/searchRepository.js";
 
 const searchUser= async (req,res)=>{
     const {id}=req.params;
@@ -8,20 +7,13 @@ const searchUser= async (req,res)=>{
         return res.sendStatus(404);
     };
     try{
-        const response = (await connection.query(
-            `SELECT * FROM users WHERE username ILIKE $1 `,[`%${search}%`]
-            )).rows;
-
-        const AllFolloweds = (await connection.query(`
-        SELECT users.* , followers."followedId" FROM users 
-        JOIN followers ON followers."followerId"=users.id
-        WHERE followers."followerId"=$1 AND username ILIKE $2`,[id,`%${search}%`])).rows;
+        const response = await searchAllUsersRepository(search);
+        const AllFolloweds = await searchUsersFollowedRepository(id,search)
         const arrFollowed=[];
         const followeds=[];
         const separeteFollowed=[];
         const separeteUnfollowed=[];
         const newResponse=[];
-        const filterResponse=[];
 
         AllFolloweds.map((e)=>(
             arrFollowed.push(e.followedId)
@@ -57,8 +49,7 @@ const searchAllUsers = async (req,res)=>{
         return res.sendStatus(404);
     };
     try{
-        // const response = (await connection.query(`SELECT * FROM users WHERE username ILIKE $1 ${lim}`,[`%${search}%`])).rows;
-        const response =  await searchUsersRepository(search);
+        const response =  await searchAllUsersRepository(search);
         return res.send(response);
     }catch(err){
         return res.status(500).send(err.message);
@@ -67,22 +58,15 @@ const searchAllUsers = async (req,res)=>{
 
 const searchUserId = async(req,res)=>{
     const {id}=req.params;
+    console.log(id)
     if(!id){
         res.sendStatus(404);
     };
     try{
-        const posts = (await connection.query(`
-        SELECT posts.description,users.email,posts.id, posts.url,posts."reposterId", posts."originPostId", users.id AS "userId",
-        users."pictureUrl" AS "image" , users.username AS name
-        FROM posts  
-        JOIN users ON users.id= posts."userId"
-        WHERE "userId"=$1
-        `,[id])).rows
+        const posts = await searchUserIdPostsRepository(id);
+        
         for (let i = 0; i < posts.length; i++) {
-            const urlInfo = await connection.query(
-              'SELECT canonical,image,title,description FROM "urlInfo" WHERE url = $1',
-              [posts[i].url]
-            );
+            const urlInfo = await searchUserIdUrlInfoRepository(posts,i)
             posts[i].urlInfo = urlInfo.rows[0];
           };
           
@@ -98,7 +82,7 @@ const getNameById=async(req,res)=>{
         return res.sendStatus(404);
     };
     try{
-        const name = (await connection.query(`SELECT * FROM users WHERE id=$1`,[id])).rows;
+        const name=await getNameByIdRepository(id);
         if(!name[0]){
             return res.sendStatus(404);
         };
