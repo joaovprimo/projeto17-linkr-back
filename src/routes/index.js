@@ -7,14 +7,17 @@ import likesRoute from "./likesRoute.js";
 import editRoute from "./editRouter.js";
 import trendRouter from "./trendRouter.js";
 import followRoute from "./followRouter.js";
+import commentsRoute from "./commentsRouter.js";
 
 const Routes = express.Router();
 Routes.use(userRoute);
 Routes.use(timelineRoute);
 Routes.use(searchRoute);
 Routes.use(trendRouter);
-Routes.use(followRoute)
+Routes.use(followRoute);
 Routes.use(deleteRoute);
 Routes.use(likesRoute);
 Routes.use(editRoute);
+Routes.use(commentsRoute);
+
 export default Routes;
