@@ -3,7 +3,7 @@ import { getNameById, searchAllUsers, searchUser, searchUserId } from "../contro
 
 const searchRoute = express.Router();
 
-searchRoute.get("/search", searchUser);
+searchRoute.get("/:id/search", searchUser);
 searchRoute.get("/search/:id", searchUserId);
 searchRoute.get("/name/:id", getNameById);
 searchRoute.get("/searchs", searchAllUsers);
