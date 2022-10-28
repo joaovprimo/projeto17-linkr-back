@@ -62,7 +62,6 @@ const getTimeline = async (req, res) => {
       ORDER BY posts.id DESC 
       LIMIT 20;`
     ,[id]);
-
     for (let i = 0; i < allPosts.rows.length; i++) {
       const urlInfo = await connection.query(
         'SELECT canonical,image,title,description FROM "urlInfo" WHERE url = $1',
