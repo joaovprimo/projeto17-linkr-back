@@ -72,7 +72,7 @@ const searchUserId = async(req,res)=>{
     };
     try{
         const posts = (await connection.query(`
-        SELECT posts.description,users.email,posts.id, posts.url, users.id AS "userId",
+        SELECT posts.description,users.email,posts.id, posts.url,posts."reposterId", posts."originPostId", users.id AS "userId",
         users."pictureUrl" AS "image" , users.username AS name
         FROM posts  
         JOIN users ON users.id= posts."userId"

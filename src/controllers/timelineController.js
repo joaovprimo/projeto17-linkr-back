@@ -4,14 +4,12 @@ import { getUserFollows } from "../repositories/followRepository.js";
 import * as trendRepository from "../repositories/trendsRepository.js";
 import { StatusCodes } from "http-status-codes";
 import { fetchOriginalPost, getRepostsCountById, insertRepost } from "../repositories/repostRepository.js";
+import { getTimelineByConnections, insertIntoPosts, insertIntoUrlInfo, selectUrlByUrl } from "../repositories/timelineRepositoty.js";
 
 const postLink = async (req, res) => {
   const body = res.locals.body;
   try {
-    await connection.query(
-      'INSERT INTO posts(url, description, "userId", "reposterId") VALUES ($1,$2,$3,$4)',
-      [body.url, body.description, body.userId, body.reposterId]
-    );
+  await insertIntoPosts(body);
     const { canonical, image, title, description } = await urlMetadata(
       body.url
     );
@@ -30,51 +28,39 @@ const postLink = async (req, res) => {
       const { rows: trendId } = await trendRepository.getTrendbyName(trend);
       await trendRepository.insertPostTrends(pId, trendId[0].id);
     }
-    await connection.query(
-      'INSERT INTO "urlInfo" (url, canonical, image, title, description) VALUES ($1,$2,$3,$4,$5)',
-      [body.url, canonical, image, title, description]
-    );
-    return res.sendStatus(201);
+    await insertIntoUrlInfo(body,canonical,image,title,description)
+    return res.sendStatus(StatusCodes.CREATED);
   } catch (error) {
-    console.log(error);
+   
     switch (error.code) {
       case "23505":
-        return res.sendStatus(201);
+        return res.sendStatus(StatusCodes.CREATED);
       case "ENOTFOUND":
-        return res.status(422).send("Link enviado está quebrado");
+        return res.status(StatusCodes.BAD_REQUEST).send("Link enviado está quebrado");
     }
-    return res.status(500).send(error);
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(error);
   }
 };
 
 const getTimeline = async (req, res) => {
   const {id} = res.locals.user;
   try {
-    const follows = await getUserFollows(id);
-    if(follows.length===0){
-      return res.status(StatusCodes.OK).send('no follows');
-    }
-    const allPosts = await connection.query(
-      `SELECT posts.*, users.username AS name, users.email, users."pictureUrl" AS image
-      FROM posts 
-      JOIN followers ON posts."userId" = followers."followedId"
-      JOIN users ON posts."userId" = users.id
-      WHERE followers."followerId"=$1
-      ORDER BY posts.id DESC 
-      LIMIT 20;`
-    ,[id]);
+    const allPosts = await getTimelineByConnections(id);
+
     for (let i = 0; i < allPosts.rows.length; i++) {
-      const urlInfo = await connection.query(
-        'SELECT canonical,image,title,description FROM "urlInfo" WHERE url = $1',
-        [allPosts.rows[i].url]
-      );
+      const urlInfo = await selectUrlByUrl(allPosts.rows[i].url)
       allPosts.rows[i].urlInfo = urlInfo.rows[0];
+    }
+    const follows = await getUserFollows(id);
+    if(follows.length===0 && allPosts.rows.length===0){
+      return res.status(StatusCodes.OK).send('no follows');
     }
     if(allPosts.rows.length===0){
       return res.status(StatusCodes.OK).send('no posts');
     }
     return res.status(StatusCodes.OK).send(allPosts.rows);
   } catch (error) {
+    console.log(error.message)
     return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
   }
 
@@ -84,7 +70,7 @@ const getRepostsById = async (req,res) => {
 const {id} = req.params;
 
 const reposts = await getRepostsCountById(id);
-if(!reposts) return res.status(404).send({message:"Não existem reposts", res: 0})
+if(!reposts) return res.send({repostsNumber: 0})
 
 return res.send(reposts)
 

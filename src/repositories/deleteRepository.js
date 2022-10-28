@@ -14,4 +14,12 @@ async function deletPost(id){
     return dlt;
 }
 
-export {deleteLikesPost, deletPost}
+async function deletPostTrendsByPostId(id){
+  return await connection.query('DELETE FROM "postsTrends" WHERE "postsId"=$1',[id])
+}
+
+async function deleteTrendsByDescription(description){
+    return await connection.query('DELETE FROM "trends" WHERE name=$1',[description]);
+}
+
+export {deleteLikesPost, deletPost, deletPostTrendsByPostId, deleteTrendsByDescription}
